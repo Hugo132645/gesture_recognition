@@ -4,7 +4,7 @@ import re
 from glob import glob
 
 gestures = ["open_palm", "fist", "thumbs_up", "two_fingers", "point_left", "point_right"] # type of gesture
-base_dir = "/Users/hugoarsenio1/Desktop/gesture_dataset" # place to save frames for each gesture
+base_dir = "/path1" # place to save frames for each gesture
 SAVE_EVERY = 5
 CAM_INDEX = 0
 
