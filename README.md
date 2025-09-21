@@ -7,8 +7,8 @@ We are collecting and preprocessing image data of different hand gestures to tra
 
 ## Files
 - **data_creation.py** – Script for recording hand gesture images using a webcam.
-- **merge_data.py** – Script for merging multiple gesture datasets into one.
-- **gesture_dataset.ipynb** – Jupyter notebook for testing, training, and experimenting with models.
+- **merge_datasets.py** – Script for merging multiple gesture datasets into one.
+- **gesture_recognition.ipynb** – Jupyter notebook for testing, training, and experimenting with models.
 
 ## Research Goals
 - Investigate how AI can interpret hand gestures reliably.
