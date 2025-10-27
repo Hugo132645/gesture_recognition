@@ -1,0 +1,5 @@
+# Requirements for the HandAngleTrack.py (this worked for me since they are all compatible with each other)
+
+opencv-python==4.8.0.76
+mediapipe==0.10.11
+numpy==1.24.4
