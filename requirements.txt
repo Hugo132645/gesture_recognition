@@ -3,3 +3,5 @@
 opencv-python==4.8.0.76
 mediapipe==0.10.11
 numpy==1.24.4
+
+# For the other files, the requirements are in the notebook.
