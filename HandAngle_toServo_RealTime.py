@@ -60,11 +60,8 @@ print("Logging to:", csv_path)
 csv_path_2 = Path("hand_log_quantized.csv").resolve()
 print("Logging to:", csv_path_2)
 
-#absolute path finder 
-absolute_path = csv_path.resolve()
-print(f"The literal path is: {absolute_path}")
 # --- ADD THIS BLOCK ---
-SERIAL_PORT = 'COM3'  # <-- Change this to your Arduino's port
+SERIAL_PORT = 'COM4'  # <-- Change this to your Arduino's port
 BAUD_RATE = 115200
 
 print(f"Connecting to {SERIAL_PORT}...")
@@ -91,9 +88,7 @@ csv_writer.writerow([
 csv_file_2 = open(csv_path_2, "w", newline="", buffering=1)
 csv_writer_2 = csv.writer(csv_file_2)
 csv_writer_2.writerow([
-    "t_unix",
-    "wrist_pitch_deg*", "wrist_roll_deg*",
-    "ang_thumb_deg*","ang_index_deg*","ang_middle_deg*","ang_ring_deg*","ang_pinky_deg*",
+    "wrist_pitch_deg", "wrist_roll_deg",
     "servo_thumb_deg*","servo_index_deg*","servo_middle_deg*","servo_ring_deg*","servo_pinky_deg*",
 ])
 _flush_every = 1
@@ -278,7 +273,7 @@ print("  w = write current calibration to 'servo_calib.txt'")
 print("  q/ESC = quit")
 
 #time delay for csv
-LOG_EVERY_S = 0.2
+LOG_EVERY_S = 0.4
 next_log_t = 0.0  # first log happens immediately
 
 FLEX_PCT_TH  = 0.10      # 10% change in normalized flex
@@ -408,8 +403,6 @@ while True:
 
             row_2 = [
                 v(smooth_wrist["pitch"]), v(smooth_wrist["roll"]),
-                v(flex_now["THUMB"]),  v(flex_now["INDEX"]),  v(flex_now["MIDDLE"]),
-                v(flex_now["RING"]),   v(flex_now["PINKY"]),
                 v(servo_q_now["THUMB"]), v(servo_q_now["INDEX"]), v(servo_q_now["MIDDLE"]),
                 v(servo_q_now["RING"]),  v(servo_q_now["PINKY"]),
             ]
@@ -440,6 +433,8 @@ while True:
                     
                     # 4. Send to Arduino
                     ser.write(data_string.encode('ascii'))
+                    
+                    print(f"Sent: {data_string}", end='')
                     
                 except Exception as e:
                     print(f"Serial send error: {e}")
