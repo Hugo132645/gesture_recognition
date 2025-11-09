@@ -1,3 +1,40 @@
+import sys
+
+import sys
+
+# --- ADVANCED HELP FLAG HANDLER ---
+if "-help" in sys.argv or "--help" in sys.argv:
+    print("\n" + "=" * 60)
+    print("REAL-TIME HAND TRACKING & SERVO CONTROLLER")
+    print("=" * 60)
+    print("\nDESCRIPTION:")
+    print("  Tracks hand gestures via webcam and sends mapped servo angles")
+    print("  to an Arduino in real-time for robotic hand control.")
+    print("\nUSAGE:")
+    print("  python HandAngle_toServo_RealTime.py [FLAGS]")
+    print("\nFLAGS:")
+    print("  -help, --help     Show this help message and exit.")
+    print("\nDEFAULT CONFIGURATION:")
+    print("  • Serial Port:    COM4")
+    print("  • Baud Rate:      115200")
+    print("  • Camera Index:   0 (Default Webcam)")
+    print("  • Smoothing:      EMA (Alpha = 0.4)")
+    print("\nKEYBOARD CONTROLS (Click video window first):")
+    print("  [ o ]  Calibrate OPEN hand pose (0% flex).")
+    print("  [ f ]  Calibrate FIST pose (100% flex).")
+    print("  [ w ]  WRITE calibration to 'servo_calib.txt'.")
+    print("  [ r ]  RESET calibration to defaults.")
+    print("  [ q ]  QUIT program (or press ESC).")
+    print("\nOUTPUTS:")
+    print("  1. Serial Data Stream (to Arduino):")
+    print("     Format: <Thumb, Index, Middle, Ring, Pinky, WristRoll, WristPitch>")
+    print("     Range:  0-180 for all values.")
+    print("  2. CSV Logs (saved to script directory):")
+    print("     - hand_log.csv (Raw smoothed angles)")
+    print("     - hand_log_quantized.csv (Final servo commands)")
+    print("\n" + "=" * 60 + "\n")
+    sys.exit(0)
+# ----------------------------------
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -5,7 +42,6 @@ import math
 from collections import deque
 import csv, time
 import serial
-
 
 # Config
 USE_WORLD_LANDMARKS = True   
@@ -420,7 +456,7 @@ while True:
                     # 2. Get and map the wrist angle
                     # We use the same logic from the playback script
                     raw_roll = smooth_wrist["roll"]
-                    
+                    raw_pitch = smooth_wrist["pitch"]
                     # Handle case where tracking is lost (raw_roll is None)
                     if raw_roll is None:
                         raw_roll = 0.0
@@ -428,8 +464,12 @@ while True:
                     wrist = 90.0 + raw_roll
                     wrist = max(0.0, min(180.0, wrist)) # Clamp 0-180
                     
+                    if raw_pitch is None:
+                        raw_pitch = 0.0
+                    wrist_pitch = 90.0 + raw_pitch
+                    wrist_pitch = max(0.0, min(180, wrist_pitch))
                     # 3. Format the string
-                    data_string = f"<{thumb:.0f},{index:.0f},{middle:.0f},{ring:.0f},{pinky:.0f},{wrist:.0f}>\n"
+                    data_string = f"<{thumb:.0f},{index:.0f},{middle:.0f},{ring:.0f},{pinky:.0f},{wrist:.0f},{wrist_pitch:.0f}>\n"
                     
                     # 4. Send to Arduino
                     ser.write(data_string.encode('ascii'))
