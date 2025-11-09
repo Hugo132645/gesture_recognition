@@ -7,7 +7,7 @@ const int PIN_INDEX = 4;
 const int PIN_THUMB = 5;
 const int PIN_PINKY = 6;
 const int PIN_MIDDLE = 7;
-
+const int PIN_WRIST_PITCH = 8; // EDIT
 // Servos (Same as before)
 Servo sRing, sWrist, sIndex, sThumb, sPinky, sMiddle;
 
@@ -19,6 +19,7 @@ void setup() {
   sThumb.attach(PIN_THUMB);
   sPinky.attach(PIN_PINKY);
   sMiddle.attach(PIN_MIDDLE);
+  sWristPitch.attach(PIN_WRIST_PITCH);
 
   // Set a safe starting position
   sThumb.write(0);
@@ -27,7 +28,7 @@ void setup() {
   sRing.write(120);
   sPinky.write(0);
   sWrist.write(135); // WRIST_NEUT
-  
+  sWristPitch.write(135); // EDIT 
   Serial.println("HAND: Proportional receiver ready.");
 }
 
@@ -48,20 +49,20 @@ void loop() {
       // 2. Parse the string to get the angles
       // We will read them in the order Python sent them.
 
-      int angles[6]; // Array to hold the 6 angles
+      int angles[7]; // Array to hold the 6 angles
       int i = 0;
       
       char* str = (char*)input.c_str(); // Convert String to char* for strtok
       char* token = strtok(str, ",");   // Split string by commas
 
-      while (token != NULL && i < 6) {
+      while (token != NULL && i < 7) {
         angles[i] = atoi(token); // Convert token (text) to integer
         token = strtok(NULL, ",");
         i++;
       }
 
       // 3. If we successfully read 6 angles, move the servos
-      if (i == 6) {
+      if (i == 7) {
         // Order: <thumb, index, middle, ring, pinky, wrist>
         sThumb.write(angles[0]);
         sIndex.write(angles[1]);
@@ -69,7 +70,7 @@ void loop() {
         sRing.write(angles[3]);
         sPinky.write(angles[4]);
         sWrist.write(angles[5]);
-        
+        sWristPitch.write(angles[6]);
         // Optional: Send a confirmation back to Python
         // Serial.println("OK"); 
       } else {
