@@ -1,0 +1,25 @@
+# Recommended conda environment that I used in a Intel Mac (these are the instructions for installing everything):
+#
+# 1) Create env with core libs via conda (avoids pip for the heavy stuff):
+#    conda create -n handtrack-env \
+#        python=3.10 \
+#        numpy=1.26.4 \
+#        opencv \
+#        matplotlib=3.8.4 \
+#        pyserial=3.5 \
+#        -c conda-forge
+#
+# 2) Activate the environment:
+#    conda activate handtrack-env
+#
+# 3) Install the remaining packages (mainly mediapipe) with pip:
+#    pip install -r requirements_handtrack.txt  (I recommend just directly installing that mediapipe version alone though)
+#
+# 4) Run the script in dry-run mode (no Arduino):
+#    python Hand_Track_v3.py --camera-index 0 --smoothing one-euro --dry-run --show-3d  (adjust it how you want, but keep the dry-run)
+
+mediapipe==0.10.21
+numpy==1.26.4
+opencv-python==4.10.0.84
+matplotlib==3.8.4
+pyserial==3.5
