@@ -1,0 +1,21 @@
+# Recommended conda environment for Intel Mac:
+#
+# 1) Create env with core libs via conda:
+#    conda create -n graspmesh-env \
+#        python=3.10 \
+#        numpy=1.26.4 \
+#        opencv \
+#        -c conda-forge
+#
+# 2) Activate the environment:
+#    conda activate graspmesh-env
+#
+# 3) Install the remaining packages (mediapipe) with pip:
+#    pip install -r requirements_graspmesh.txt  (recommend to just install mediapipe alone after creating the env with the other libs)
+#
+# 4) Run the script:
+#    python Grasp_Mesh.py --camera-index 0  (you only need to add the camera index if you want one specifically; otherwise just run it)
+
+mediapipe==0.10.21
+numpy==1.26.4
+opencv-python==4.10.0.84
