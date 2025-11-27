@@ -294,6 +294,14 @@ def nflex(angle_deg):
     return float(angle_deg) / 90.0
 
 
+def draw_progress_bar(percent, width=10):
+    """Draw ASCII progress bar: [=====     ] 50%"""
+    percent = max(0.0, min(100.0, percent))
+    filled = int((percent / 100.0) * width)
+    bar = "=" * filled + " " * (width - filled)
+    return f"[{bar}] {percent:3.0f}%"
+
+
 def qdeg(x, q, lo=SERVO_MIN, hi=SERVO_MAX):
     if x is None:
         return None
@@ -328,12 +336,12 @@ def parse_args():
         default="one-euro",
     )
     parser.add_argument("--alpha", type=float, default=0.35)
-    parser.add_argument("--min-cutoff", type=float, default=1.0)
+    parser.add_argument("--min-cutoff", type=float, default=0.80)
     parser.add_argument("--beta", type=float, default=0.04)
     parser.add_argument("--dcutoff", type=float, default=1.0)
     parser.add_argument("--median-window", type=int, default=10, help="Temporal median filter window size")
     parser.add_argument("--rate-limit", type=float, default=10.0, help="Max angle change per frame (degrees)")
-    parser.add_argument("--hysteresis", type=float, default=2.5, help="Dead zone threshold (degrees)")
+    parser.add_argument("--hysteresis", type=float, default=1.0, help="Dead zone threshold (degrees)")
     parser.add_argument("--enable-median", action="store_true", default=True, help="Enable temporal median filter")
     parser.add_argument("--enable-rate-limit", action="store_true", default=True, help="Enable rate limiter")
     parser.add_argument("--enable-hysteresis", action="store_true", default=True, help="Enable hysteresis filter")
@@ -465,8 +473,10 @@ def main():
     last_flex = {name: None for name, _, _ in FINGERS}
     last_servo_q = {name: None for name, _, _ in FINGERS}
     last_time = time.monotonic()
+    
+    verification_mode = False
 
-    print("Keys: o=open pose  f=fist pose  r=reset  w=write  q/ESC=quit")
+    print("Keys: o=open  f=fist  v=verify  r=reset  w=write  q/ESC=quit")
 
     while True:
         ok, frame = cap.read()
@@ -577,7 +587,7 @@ def main():
                 servo_angle = servo_map(calib, name, angle)
                 servo_vals[name] = servo_angle
                 flex_now[name] = nflex(angle)
-                servo_q_now[name] = qdeg(servo_angle, q=2.0)
+                servo_q_now[name] = qdeg(servo_angle, q=1.0)
 
             chg_flex = 0.0
             chg_servo = 0.0
@@ -594,9 +604,9 @@ def main():
                 chg_servo = max(chg_servo, abs(s_new - s_old))
 
             t_now = time.time()
+            # With cascaded filters, send on any detected change or keepalive
             should_send = (
                 (chg_flex >= FLEX_PCT_TH)
-                or (chg_servo >= SERVO_DEG_TH)
                 or ((now - last_tx_time) >= KEEPALIVE_S)
             )
 
@@ -648,7 +658,8 @@ def main():
             )
             y0 += 30
 
-            for name, angle in finger_angles.items():
+            for name in ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]:
+                angle = angle_dict.get(name, 0.0)
                 servo_angle = servo_vals.get(name, 0.0)
                 text = f"{name[0]}: {angle:.1f} -> {servo_angle:.0f}"
                 cv2.putText(
@@ -662,12 +673,62 @@ def main():
                 )
                 y0 += 20
 
+            # Verification mode - show progress bars
+            if verification_mode:
+                # Position at bottom right
+                bar_width = 350  # Width of the text area
+                y0 = h - 160  # Start from bottom
+                x0 = w - bar_width - 10  # Right side
+                
+                cv2.putText(
+                    overlay,
+                    "[VERIFICATION MODE]",
+                    (x0, y0),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (0, 0, 0),  # Black
+                    2,
+                )
+                y0 += 25
+                
+                for name in ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]:
+                    angle = angle_dict.get(name, 0.0)
+                    servo = servo_vals.get(name, 0.0)
+                    # Calculate percentage based on calibration
+                    # Handle both increasing and decreasing angles
+                    a_open = calib[name]["open_angle"]
+                    a_fist = calib[name]["fist_angle"]
+                    
+                    if abs(a_fist - a_open) > 1e-3:
+                        # Calculate how far we are from open to fist (0% to 100%)
+                        raw_pct = ((angle - a_open) / (a_fist - a_open)) * 100.0
+                        # If the range is inverted (fist < open), the percentage already works correctly
+                        # because the negative denominator flips the sign appropriately
+                        pct = raw_pct
+                    else:
+                        pct = 0.0
+                    # Clamp to 0-100%
+                    pct = max(0.0, min(100.0, pct))
+                    
+                    bar = draw_progress_bar(pct, width=10)
+                    text = f"{name[0]}: {bar} -> {servo:.0f}deg"
+                    cv2.putText(
+                        overlay,
+                        text,
+                        (x0, y0),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (0, 0, 0),  # Black
+                        2,
+                    )
+                    y0 += 25
+
         cv2.putText(
             overlay,
-            "o=open  f=fist  r=reset  w=write  q/ESC=quit",
+            "o=open  f=fist  v=verify  r=reset  w=write  q=quit",
             (10, h - 12),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
+            0.55,
             (255, 255, 255),
             2,
         )
@@ -699,6 +760,10 @@ def main():
             print("Fist pose captured")
             if open_pose and fist_pose:
                 update_calibration(calib, open_pose, fist_pose)
+        elif key == ord("v"):
+            verification_mode = not verification_mode
+            mode_str = "ON" if verification_mode else "OFF"
+            print(f"Verification mode: {mode_str}")
         elif key == ord("r"):
             calib = default_calibration()
             open_pose = {}
