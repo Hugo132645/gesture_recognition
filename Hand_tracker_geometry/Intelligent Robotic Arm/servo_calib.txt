@@ -1,0 +1,48 @@
+{
+  "calib": {
+    "THUMB": {
+      "open_angle": 11.085862492494329,
+      "fist_angle": 6.266179977183597,
+      "servo_open": 0.0,
+      "servo_close": 100.0
+    },
+    "INDEX": {
+      "open_angle": 14.096089151202676,
+      "fist_angle": 73.23183709673354,
+      "servo_open": 0.0,
+      "servo_close": 110.0
+    },
+    "MIDDLE": {
+      "open_angle": 24.668521648745696,
+      "fist_angle": 70.57050078970255,
+      "servo_open": 0.0,
+      "servo_close": 90.0
+    },
+    "RING": {
+      "open_angle": 21.916403676001536,
+      "fist_angle": 65.98765644769905,
+      "servo_open": 0.0,
+      "servo_close": 110.0
+    },
+    "PINKY": {
+      "open_angle": 1.920331659492561,
+      "fist_angle": 77.16105378398005,
+      "servo_open": 0.0,
+      "servo_close": 100.0
+    }
+  },
+  "open": {
+    "THUMB": 11.085862492494329,
+    "INDEX": 14.096089151202676,
+    "MIDDLE": 24.668521648745696,
+    "RING": 21.916403676001536,
+    "PINKY": 1.920331659492561
+  },
+  "fist": {
+    "THUMB": 6.266179977183597,
+    "INDEX": 73.23183709673354,
+    "MIDDLE": 70.57050078970255,
+    "RING": 65.98765644769905,
+    "PINKY": 77.16105378398005
+  }
+}
