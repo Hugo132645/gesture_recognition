@@ -1,7 +1,6 @@
-# Requirements for the HandAngleTrack.py (this worked for me since they are all compatible with each other)
-
-opencv-python==4.8.0.76
-mediapipe==0.10.11
-numpy==1.24.4
-
-# For the other files, the requirements are in the notebook.
+# Runtime for the latest vision-based controller (Python 3.10 recommended).
+mediapipe==0.10.21
+numpy==1.26.4
+opencv-python==4.10.0.84
+matplotlib==3.8.4
+pyserial==3.5

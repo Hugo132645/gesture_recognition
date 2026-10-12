@@ -209,3 +209,8 @@ __marimo__/
 # Jupyter Notebook specific
 .ipynb_checkpoints/
 .jupyter/
+
+# Local calibration and new experiment outputs
+/config/servo_calib.json
+/outputs/
+.DS_Store
