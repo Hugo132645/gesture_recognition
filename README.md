@@ -1,5 +1,12 @@
 # Vision-Based Robotic Hand Control
 
+![Python](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-97CA00)](LICENSE)
+![MediaPipe](https://img.shields.io/badge/Tracking-MediaPipe-0097A7)
+![OpenCV](https://img.shields.io/badge/Vision-OpenCV-5C3EE8?logo=opencv&logoColor=white)
+![Arduino Mega](https://img.shields.io/badge/Hardware-Arduino%20Mega-00878F?logo=arduino&logoColor=white)
+![Local processing](https://img.shields.io/badge/Processing-Local-7952B3)
+
 Real-time hand tracking and servo control for a robotic hand, using a webcam, MediaPipe hand landmarks, and an Arduino Mega. The current implementation estimates finger flexion and wrist orientation geometrically, maps calibrated poses to servo angles, and sends commands over serial.
 
 This README describes the latest integrated implementation on `main`. This is a research prototype; accuracy, latency, and hardware reliability have not been established through a comparative benchmark.
